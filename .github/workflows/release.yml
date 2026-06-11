@@ -1,15 +1,13 @@
 name: Release
-# Publishes to npm when a GitHub Release is published, using npm Trusted
-# Publishing (OIDC). No NPM_TOKEN secret is needed: the runner authenticates
-# to npm via its short-lived OIDC identity, and publishes with provenance.
+# Publishes to npm when a GitHub Release is published. Authenticates with a
+# granular access token (NPM_TOKEN secret) that has "bypass 2FA" enabled, so
+# no interactive 2FA is needed on the runner. The org restricts the Actions
+# token to read-only, so we avoid any git writes from the runner.
 on:
   release:
     types: [published]
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-permissions:
-  contents: read
-  id-token: write # required for npm OIDC Trusted Publishing
 jobs:
   publish:
     runs-on: ubuntu-latest
@@ -23,7 +21,6 @@ jobs:
           registry-url: https://registry.npmjs.org
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
-      # npm >= 11.5 is required for Trusted Publishing; the Node 20 bundled
-      # npm is older, so upgrade it before publishing.
-      - run: npm install -g npm@latest
-      - run: npm publish --provenance --access public
+      - run: pnpm publish --no-git-checks --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
