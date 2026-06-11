@@ -1,0 +1,8 @@
+[
+  {
+    "name": "snippet (gzip)",
+    "path": "dist/takt.js",
+    "limit": "1 kB",
+    "gzip": true
+  }
+]

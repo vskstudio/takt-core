@@ -1,0 +1,35 @@
+{
+  "name": "@takt/core",
+  "version": "0.0.0",
+  "description": "Tiny privacy-friendly analytics SDK for Takt",
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" },
+    "./snippet": "./dist/takt.js"
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "size": "size-limit"
+  },
+  "devDependencies": {
+    "@size-limit/preset-small-lib": "^11.1.6",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "eslint": "^9.0.0",
+    "jsdom": "^25.0.0",
+    "size-limit": "^11.1.6",
+    "tsup": "^8.3.0",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
+  },
+  "packageManager": "pnpm@9.0.0"
+}
