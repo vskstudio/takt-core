@@ -12,6 +12,7 @@ export type Revenue = { amount: string; currency: string }
 let _instance: Analytics | null = null
 let _disposers: Array<() => void> = []
 
+/** Options for {@link init} — `createTakt`'s {@link Config} plus the autocapture toggles. */
 export interface InitOptions {
   domain?: string
   endpoint?: string
@@ -29,6 +30,10 @@ export interface InitOptions {
   fileExtensions?: string[]
 }
 
+/**
+ * Bootstrap the default instance: create it, enable requested autocapture, and —
+ * unless `auto` is `false` — start SPA tracking and fire an initial pageview.
+ */
 export function init(opts: InitOptions = {}): Analytics {
   _reset()
 
@@ -55,18 +60,22 @@ export function init(opts: InitOptions = {}): Analytics {
   return _instance
 }
 
+/** Track a custom event on the default instance. No-op until {@link init} has run. */
 export function track(name: string, opts?: TrackOptions): void {
   _instance?.track(name, opts)
 }
 
+/** Send a pageview on the default instance. No-op until {@link init} has run. */
 export function pageview(): void {
   _instance?.pageview()
 }
 
+/** Opt the visitor out of tracking (persisted). No-op until {@link init} has run. */
 export function optOut(): void {
   _instance?.optOut()
 }
 
+/** Reverse a previous {@link optOut}. No-op until {@link init} has run. */
 export function optIn(): void {
   _instance?.optIn()
 }

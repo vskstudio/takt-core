@@ -8,6 +8,7 @@ import { HistoryNavigationProvider } from '../infrastructure/browser/HistoryNavi
 import { DocumentClickSource } from '../infrastructure/browser/DocumentClickSource'
 import createUrlScrubber, { type UrlScrubber } from '../domain/url/UrlScrubber'
 
+/** Configuration for {@link createTakt} — the core SDK without the autocapture toggles. */
 export interface Config {
   domain?: string
   endpoint?: string
@@ -21,6 +22,10 @@ export interface Config {
   scrubUrl?: UrlScrubber
 }
 
+/**
+ * Create a standalone instance the caller owns — privacy defaults on, but no
+ * autocapture and no module singleton (unlike {@link init}).
+ */
 export function createTakt(config: Config = {}): Analytics {
   const resolvedConfig: AnalyticsConfig = {
     domain: config.domain || location.hostname,

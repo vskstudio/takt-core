@@ -1,5 +1,11 @@
 # @vskstudio/takt-core
 
+## 0.2.2
+
+### Patch Changes
+
+- TSDoc on the public API (`init`, `track`, `pageview`, `optOut`, `optIn`, `InitOptions`, `Config`) for IDE hover, plus package metadata (`author`, `engines.node`, `unpkg`/`jsdelivr` for the CDN snippet). No runtime change.
+
 ## 0.2.1
 
 ### Patch Changes

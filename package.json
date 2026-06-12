@@ -1,8 +1,9 @@
 {
   "name": "@vskstudio/takt-core",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Tiny privacy-friendly analytics SDK for Takt",
   "license": "MIT",
+  "author": "VSK Studio",
   "type": "module",
   "sideEffects": false,
   "keywords": [
@@ -26,6 +27,8 @@
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "unpkg": "./dist/takt.js",
+  "jsdelivr": "./dist/takt.js",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -36,6 +39,9 @@
   "files": [
     "dist"
   ],
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "build": "tsup",
     "typecheck": "tsc --noEmit",
