@@ -1,5 +1,11 @@
 # @vskstudio/takt-core
 
+## 0.3.0
+
+### Minor Changes
+
+- Add server-rendered widget URL builders (`badgeUrl`, `embedUrl`) and an anonymous public stats client (`createStats` → summary/timeseries/realtime/breakdown), with `PublicApiError` and the associated widget/stats types. Framework-agnostic and tree-shakeable.
+
 ## 0.2.2
 
 ### Patch Changes

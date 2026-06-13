@@ -128,6 +128,32 @@ optIn()  // resumes tracking
 
 Events are suppressed, in order, when: the visitor has opted out, **or** Do Not Track is enabled (`respectDnt`), **or** the host is localhost / a private IP (`excludeLocalhost`), **or** the event is dropped by `sampleRate`.
 
+## Widgets & public stats
+
+Besides tracking, the package ships framework-agnostic helpers for Takt's
+server-rendered widgets and its public stats API. These are tree-shakeable and
+re-exported by the framework wrappers (`@vskstudio/takt-react`, `-vue`, etc.).
+
+```ts
+import { badgeUrl, embedUrl, createStats } from '@vskstudio/takt-core'
+
+// URL builders for the server-rendered badge SVG and embed iframe.
+badgeUrl('example.com', { variant: 'd', glyph: 'off', lang: 'en' })
+// → /public/example.com/badge.svg?variant=d&glyph=off&lang=en
+embedUrl('example.com', { theme: 'dark' })
+// → /embed/example.com?theme=dark
+
+// Anonymous client for the public stats API. Pass `host` for a remote Takt.
+const stats = createStats({ host: 'https://takt.example.com', domain: 'example.com' })
+await stats.summary(undefined, { period: '30d', compare: 'previous' })
+await stats.timeseries()
+await stats.realtime()
+await stats.breakdown('page')
+```
+
+`host` defaults to `''` (same-origin), matching the SDK's relative `endpoint`.
+Errors surface as `PublicApiError` (carrying the HTTP `status`).
+
 ## Wire payload contract
 
 Every event is posted to the endpoint as a compact JSON object. The keys are frozen — the Takt backend ingestion depends on them:

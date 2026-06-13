@@ -7,6 +7,34 @@ export type { Config } from './createTakt'
 export type { TrackOptions } from '../application/Analytics'
 export type { Payload } from '../domain/event/Payload'
 
+// Server-rendered widget URL builders.
+export { badgeUrl, embedUrl } from '../widget/url'
+export type {
+  BadgeOptions,
+  EmbedOptions,
+  BadgeVariant,
+  BadgeGlyph,
+  EmbedTheme,
+  WidgetLang,
+} from '../widget/url'
+
+// Public stats client.
+export { createStats, PublicApiError } from '../stats/client'
+export type {
+  StatsClient,
+  StatsClientOptions,
+  StatsParams,
+  StatsPeriod,
+  StatsDimension,
+  StatsMetrics,
+  StatsSummary,
+  StatsPoint,
+  StatsTimeseries,
+  StatsBreakdownRow,
+  StatsBreakdown,
+  StatsRealtime,
+} from '../stats/client'
+
 export type Revenue = { amount: string; currency: string }
 
 let _instance: Analytics | null = null
