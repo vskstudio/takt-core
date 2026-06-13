@@ -152,6 +152,9 @@ await stats.breakdown('page')
 ```
 
 `host` defaults to `''` (same-origin), matching the SDK's relative `endpoint`.
+When set, it must be an absolute `http(s)://` origin — anything else
+(`javascript:`, `data:`, protocol-relative `//…`) is rejected, so a `host`
+value can never smuggle a non-http scheme into a widget `src` or a `fetch`.
 Errors surface as `PublicApiError` (carrying the HTTP `status`).
 
 ## Wire payload contract

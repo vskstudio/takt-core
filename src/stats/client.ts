@@ -3,6 +3,8 @@
 // surface as {@link PublicApiError}. Used by the framework wrappers to power live widgets
 // and custom dashboards without touching the authenticated session API.
 
+import { normalizeHost } from '../widget/url'
+
 export type StatsPeriod = '24h' | '7d' | '30d' | '90d' | '12mo' | 'custom'
 export type StatsDimension =
   | 'page'
@@ -108,7 +110,11 @@ async function publicGet<T>(url: string): Promise<T> {
     }
     throw new PublicApiError(res.status, message)
   }
-  return (await res.json()) as T
+  try {
+    return (await res.json()) as T
+  } catch {
+    throw new PublicApiError(res.status, 'invalid JSON response')
+  }
 }
 
 export interface StatsClient {
@@ -120,8 +126,7 @@ export interface StatsClient {
 
 /** Create a stats client bound to a host (and optionally a default domain). */
 export function createStats(opts: StatsClientOptions = {}): StatsClient {
-  const host = opts.host ?? ''
-  const base = `${host}/api/v1/public/sites`
+  const base = `${normalizeHost(opts.host)}/api/v1/public/sites`
   const path = (domain: string, resource: string) =>
     `${base}/${encodeURIComponent(domain)}/stats/${resource}`
   const pick = (domain?: string): string => {

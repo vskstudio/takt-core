@@ -23,6 +23,17 @@ export interface EmbedOptions {
   lang?: WidgetLang
 }
 
+// `host` must be empty (same-origin, relative) or an absolute http(s) origin.
+// Rejecting everything else stops `javascript:`/`data:`/protocol-relative (`//evil`)
+// values from flowing into an <img>/<iframe> `src` or a fetch() in the wrappers.
+export function normalizeHost(host?: string): string {
+  if (!host) return ''
+  if (!/^https?:\/\//i.test(host)) {
+    throw new Error('takt: host must be an absolute http(s) URL (e.g. https://takt.example.com) or empty')
+  }
+  return host.replace(/\/+$/, '')
+}
+
 // Defaults match the server's allow-list fallbacks, so they're omitted from the query.
 function build(base: string, params: Record<string, string | undefined>, defaults: Record<string, string>): string {
   const qs = new URLSearchParams()
@@ -35,12 +46,12 @@ function build(base: string, params: Record<string, string | undefined>, default
 
 /** URL of the badge SVG. `variant` defaults to `a`, `lang` to `fr`; `glyph` only affects the fallback. */
 export function badgeUrl(domain: string, opts: BadgeOptions = {}): string {
-  const base = `${opts.host ?? ''}/public/${encodeURIComponent(domain)}/badge.svg`
+  const base = `${normalizeHost(opts.host)}/public/${encodeURIComponent(domain)}/badge.svg`
   return build(base, { variant: opts.variant, glyph: opts.glyph, lang: opts.lang }, { variant: 'a', lang: 'fr' })
 }
 
 /** URL of the embed iframe page. `theme` defaults to `light`, `lang` to `fr`. */
 export function embedUrl(domain: string, opts: EmbedOptions = {}): string {
-  const base = `${opts.host ?? ''}/embed/${encodeURIComponent(domain)}`
+  const base = `${normalizeHost(opts.host)}/embed/${encodeURIComponent(domain)}`
   return build(base, { theme: opts.theme, lang: opts.lang }, { theme: 'light', lang: 'fr' })
 }

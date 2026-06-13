@@ -1,5 +1,11 @@
 # @vskstudio/takt-core
 
+## 0.3.1
+
+### Patch Changes
+
+- Harden the widget URL builders and stats client: `host` must now be empty (same-origin) or an absolute `http(s)://` origin — `javascript:`, `data:`, and protocol-relative (`//…`) values are rejected so they can never reach a widget `src` or a `fetch`. Also map non-JSON success bodies to `PublicApiError`. Exports the `normalizeHost` helper.
+
 ## 0.3.0
 
 ### Minor Changes

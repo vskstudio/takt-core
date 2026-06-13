@@ -33,4 +33,27 @@ describe('widget/url embedUrl', () => {
       'https://t.io/embed/a.com?theme=dark&lang=en',
     )
   })
+
+  it('encodes the domain', () => {
+    expect(embedUrl('foo bar.com')).toBe('/embed/foo%20bar.com')
+  })
+
+  it('strips a trailing slash on host', () => {
+    expect(embedUrl('a.com', { host: 'https://t.io/' })).toBe('https://t.io/embed/a.com')
+  })
+})
+
+describe('widget/url host validation', () => {
+  it('accepts empty (relative) and absolute http(s) hosts', () => {
+    expect(() => badgeUrl('a.com')).not.toThrow()
+    expect(() => badgeUrl('a.com', { host: 'http://t.io' })).not.toThrow()
+    expect(() => embedUrl('a.com', { host: 'https://t.io' })).not.toThrow()
+  })
+
+  for (const bad of ['javascript:alert(1)', 'data:text/html,x', '//evil.com', 'evil.com', 'ftp://t.io']) {
+    it(`rejects unsafe host ${bad}`, () => {
+      expect(() => badgeUrl('a.com', { host: bad })).toThrow(/absolute http/)
+      expect(() => embedUrl('a.com', { host: bad })).toThrow(/absolute http/)
+    })
+  }
 })

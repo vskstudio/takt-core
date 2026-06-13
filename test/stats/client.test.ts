@@ -51,6 +51,27 @@ describe('stats/client', () => {
     await expect(stats.summary()).rejects.toBeInstanceOf(PublicApiError)
   })
 
+  it('passes breakdown dimension + filters as query params', async () => {
+    const f = mockFetch(200, { dimension: 'page', rows: [] })
+    vi.stubGlobal('fetch', f)
+    const stats = createStats({ domain: 'a.com' })
+    await stats.breakdown('page', undefined, { period: '7d', country: 'FR' })
+    expect(f).toHaveBeenCalledWith(
+      '/api/v1/public/sites/a.com/stats/breakdown?dimension=page&period=7d&country=FR',
+      expect.anything(),
+    )
+  })
+
+  it('maps a non-JSON error body to PublicApiError via statusText', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => new Response('<html>502</html>', { status: 502, statusText: 'Bad Gateway' })))
+    const stats = createStats({ domain: 'a.com' })
+    await expect(stats.summary()).rejects.toMatchObject({ status: 502, message: 'Bad Gateway' })
+  })
+
+  it('rejects an unsafe host at construction time', () => {
+    expect(() => createStats({ host: 'javascript:alert(1)' })).toThrow(/absolute http/)
+  })
+
   it('requires a domain', async () => {
     const stats = createStats()
     await expect(stats.realtime()).rejects.toThrow(/domain is required/)

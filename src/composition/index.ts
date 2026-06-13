@@ -8,7 +8,7 @@ export type { TrackOptions } from '../application/Analytics'
 export type { Payload } from '../domain/event/Payload'
 
 // Server-rendered widget URL builders.
-export { badgeUrl, embedUrl } from '../widget/url'
+export { badgeUrl, embedUrl, normalizeHost } from '../widget/url'
 export type {
   BadgeOptions,
   EmbedOptions,
