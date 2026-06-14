@@ -41,6 +41,10 @@ describe('widget/url embedUrl', () => {
   it('strips a trailing slash on host', () => {
     expect(embedUrl('a.com', { host: 'https://t.io/' })).toBe('https://t.io/embed/a.com')
   })
+
+  it('reduces a host with a path/query to its origin', () => {
+    expect(embedUrl('a.com', { host: 'https://t.io/x?a=1' })).toBe('https://t.io/embed/a.com')
+  })
 })
 
 describe('widget/url host validation', () => {

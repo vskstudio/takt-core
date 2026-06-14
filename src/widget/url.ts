@@ -28,10 +28,18 @@ export interface EmbedOptions {
 // values from flowing into an <img>/<iframe> `src` or a fetch() in the wrappers.
 export function normalizeHost(host?: string): string {
   if (!host) return ''
-  if (!/^https?:\/\//i.test(host)) {
+  let url: URL
+  try {
+    url = new URL(host)
+  } catch {
     throw new Error('takt: host must be an absolute http(s) URL (e.g. https://takt.example.com) or empty')
   }
-  return host.replace(/\/+$/, '')
+  if (url.protocol !== 'http:' && url.protocol !== 'https:') {
+    throw new Error('takt: host must be an absolute http(s) URL (e.g. https://takt.example.com) or empty')
+  }
+  // Keep only the origin — a host carrying a path/query/fragment would otherwise
+  // splice into the built URL (e.g. `https://x/y?a=1/public/...`).
+  return url.origin
 }
 
 // Defaults match the server's allow-list fallbacks, so they're omitted from the query.
