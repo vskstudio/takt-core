@@ -155,6 +155,8 @@ await stats.breakdown('page')
 When set, it must be an absolute `http(s)://` origin — anything else
 (`javascript:`, `data:`, protocol-relative `//…`) is rejected, so a `host`
 value can never smuggle a non-http scheme into a widget `src` or a `fetch`.
+The value is reduced to its origin: any path, query, or fragment is dropped
+(`https://takt.example.com/x?a=1` → `https://takt.example.com`).
 Errors surface as `PublicApiError` (carrying the HTTP `status`).
 
 ## Wire payload contract
