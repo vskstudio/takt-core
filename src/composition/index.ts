@@ -44,6 +44,7 @@ let _disposers: Array<() => void> = []
 export interface InitOptions {
   domain?: string
   endpoint?: string
+  scriptOrigin?: string
   respectDnt?: boolean
   excludeLocalhost?: boolean
   enabled?: boolean
@@ -68,6 +69,7 @@ export function init(opts: InitOptions = {}): Analytics {
   _instance = createTakt({
     domain: opts.domain,
     endpoint: opts.endpoint,
+    scriptOrigin: opts.scriptOrigin,
     respectDnt: opts.respectDnt,
     excludeLocalhost: opts.excludeLocalhost,
     enabled: opts.enabled,

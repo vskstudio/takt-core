@@ -33,6 +33,16 @@ describe('composition/index init()', () => {
     expect(body).toMatchObject({ n: 'pageview', d: 'example.com' })
   })
 
+  it('derives the endpoint from scriptOrigin (first-party)', () => {
+    init({ domain: 'example.com', scriptOrigin: 'https://stats.example.com/', auto: true })
+    expect((beaconMock.mock.calls[0] as [string, string])[0]).toBe('https://stats.example.com/api/event')
+  })
+
+  it('lets endpoint win over scriptOrigin', () => {
+    init({ domain: 'example.com', endpoint: '/collect', scriptOrigin: 'https://stats.example.com', auto: true })
+    expect((beaconMock.mock.calls[0] as [string, string])[0]).toBe('/collect')
+  })
+
   it('does not send an initial pageview when auto is false', () => {
     init({ domain: 'example.com', auto: false })
     expect(beaconMock).not.toHaveBeenCalled()

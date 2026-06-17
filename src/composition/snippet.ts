@@ -9,7 +9,11 @@ export function runSnippet(el: HTMLScriptElement | null): void {
   const has = (k: string) => !!el && el.hasAttribute(k)
 
   const domain = get('data-domain') || location.hostname
-  const endpoint = get('data-endpoint') || '/api/event'
+  // data-script-origin (first-party / anti-adblock) : origine d'où Takt sert
+  // l'ingest (domaine Takt ou domaine custom du client). data-endpoint reste
+  // prioritaire ; sinon on dérive {origin}/api/event, défaut relatif.
+  const origin = get('data-script-origin')
+  const endpoint = get('data-endpoint') || (origin ? origin.replace(/\/+$/, '') + '/api/event' : '/api/event')
   const excl = get('data-exclude-localhost') !== 'false'
   const outbound = has('data-outbound')
   const files = has('data-files')

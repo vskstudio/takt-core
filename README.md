@@ -45,7 +45,8 @@ Calls made before the script finishes loading are queued and replayed — instal
 | Attribute | Effect | Default |
 | --- | --- | --- |
 | `data-domain` | Site identifier sent with every event | `location.hostname` |
-| `data-endpoint` | Ingestion endpoint | `/api/event` |
+| `data-script-origin` | First-party origin to derive the endpoint from (`{origin}/api/event`) — your Takt domain or a custom domain to dodge ad-blockers | none |
+| `data-endpoint` | Ingestion endpoint (wins over `data-script-origin`) | `/api/event` |
 | `data-outbound` | Auto-track outbound link clicks (presence flag) | off |
 | `data-files` | Auto-track file downloads (presence flag) | off |
 | `data-exclude-localhost="false"` | Track localhost / private IPs | excluded |
@@ -105,7 +106,8 @@ stopFiles()
 | Option | Type | Default | Effect |
 | --- | --- | --- | --- |
 | `domain` | `string` | `location.hostname` | Site identifier sent with every event |
-| `endpoint` | `string` | `/api/event` | Ingestion endpoint |
+| `scriptOrigin` | `string` | none | First-party origin to derive the endpoint from (`{origin}/api/event`) — your Takt domain or a custom domain to dodge ad-blockers |
+| `endpoint` | `string` | `/api/event` | Ingestion endpoint (wins over `scriptOrigin`) |
 | `enabled` | `boolean` | `true` | Master switch — when `false`, nothing is sent |
 | `debug` | `boolean` | `false` | Log each payload to the console before sending |
 | `sampleRate` | `number` | `1` | Keep this fraction of events (e.g. `0.25` ≈ 25%) |

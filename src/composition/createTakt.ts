@@ -12,6 +12,7 @@ import createUrlScrubber, { type UrlScrubber } from '../domain/url/UrlScrubber'
 export interface Config {
   domain?: string
   endpoint?: string
+  scriptOrigin?: string
   respectDnt?: boolean
   excludeLocalhost?: boolean
   enabled?: boolean
@@ -23,13 +24,25 @@ export interface Config {
 }
 
 /**
+ * Resolve the ingest endpoint. `endpoint` wins if given; otherwise, when a
+ * `scriptOrigin` is set (first-party / anti-adblock: the Takt domain or a custom
+ * domain), derive `${origin}/api/event`. Falls back to a same-origin relative
+ * path.
+ */
+export function resolveEndpoint(endpoint?: string, scriptOrigin?: string): string {
+  if (endpoint) return endpoint
+  if (scriptOrigin) return scriptOrigin.replace(/\/+$/, '') + '/api/event'
+  return '/api/event'
+}
+
+/**
  * Create a standalone instance the caller owns — privacy defaults on, but no
  * autocapture and no module singleton (unlike {@link init}).
  */
 export function createTakt(config: Config = {}): Analytics {
   const resolvedConfig: AnalyticsConfig = {
     domain: config.domain || location.hostname,
-    endpoint: config.endpoint ?? '/api/event',
+    endpoint: resolveEndpoint(config.endpoint, config.scriptOrigin),
     respectDnt: config.respectDnt ?? true,
     excludeLocalhost: config.excludeLocalhost ?? true,
     enabled: config.enabled ?? true,

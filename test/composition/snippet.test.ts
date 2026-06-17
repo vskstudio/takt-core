@@ -39,6 +39,16 @@ describe('runSnippet', () => {
     expect(body.d).toBe('example.com')
   })
 
+  it('derives the endpoint from data-script-origin', () => {
+    runSnippet(scriptEl({ 'data-domain': 'snippet.test', 'data-script-origin': 'https://stats.example.com/' }))
+    expect((beaconMock.mock.calls[0] as [string, string])[0]).toBe('https://stats.example.com/api/event')
+  })
+
+  it('lets data-endpoint win over data-script-origin', () => {
+    runSnippet(scriptEl({ 'data-domain': 'snippet.test', 'data-script-origin': 'https://stats.example.com', 'data-endpoint': '/collect' }))
+    expect((beaconMock.mock.calls[0] as [string, string])[0]).toBe('/collect')
+  })
+
   it('exposes window.takt for custom events', () => {
     runSnippet(scriptEl({ 'data-domain': 'snippet.test' }))
     const takt = (window as unknown as { takt: (n: string, o?: unknown) => void }).takt
