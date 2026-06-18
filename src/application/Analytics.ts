@@ -14,6 +14,7 @@ import type { ClickSource } from './ports/ClickSource'
 import { OutboundLinkTracker } from './autocapture/OutboundLinkTracker'
 import { FileDownloadTracker } from './autocapture/FileDownloadTracker'
 import { SpaPageviewTracker } from './autocapture/SpaPageviewTracker'
+import { NotFoundTracker } from './autocapture/NotFoundTracker'
 
 export interface TrackOptions {
   props?: Record<string, string>
@@ -86,6 +87,10 @@ export class Analytics {
       (name, opts) => this.track(name, opts),
       extensions,
     ).enable()
+  }
+
+  enable404(): () => void {
+    return new NotFoundTracker((name, opts) => this.track(name, opts)).enable()
   }
 
   private _emit(name: EventName, opts?: TrackOptions): void {

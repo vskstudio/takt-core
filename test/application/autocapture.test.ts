@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { OutboundLinkTracker } from '../../src/application/autocapture/OutboundLinkTracker'
 import { FileDownloadTracker } from '../../src/application/autocapture/FileDownloadTracker'
+import { NotFoundTracker } from '../../src/application/autocapture/NotFoundTracker'
 import type { ClickSource } from '../../src/application/ports/ClickSource'
 import type { EnvironmentProvider } from '../../src/application/ports/EnvironmentProvider'
 import type { TrackOptions } from '../../src/application/Analytics'
@@ -92,5 +93,35 @@ describe('FileDownloadTracker', () => {
     new FileDownloadTracker(source, (n, o) => calls.push([n, o])).enable()
     trigger(link('https://example.com/archive.zip'))
     expect(calls).toHaveLength(1)
+  })
+})
+
+describe('NotFoundTracker', () => {
+  it('emits 404 with the path when a marker element is present', () => {
+    const marker = document.createElement('div')
+    marker.setAttribute('data-takt-404', '')
+    document.body.appendChild(marker)
+    const calls: [string, TrackOptions?][] = []
+    new NotFoundTracker((n, o) => calls.push([n, o])).enable()
+    expect(calls).toHaveLength(1)
+    expect(calls[0][0]).toBe('404')
+    expect(calls[0][1]?.props?.path).toBe(location.pathname)
+    marker.remove()
+  })
+
+  it('emits 404 when a takt:404 meta tag is present', () => {
+    const meta = document.createElement('meta')
+    meta.setAttribute('name', 'takt:404')
+    document.head.appendChild(meta)
+    const calls: [string, TrackOptions?][] = []
+    new NotFoundTracker((n, o) => calls.push([n, o])).enable()
+    expect(calls).toHaveLength(1)
+    meta.remove()
+  })
+
+  it('does nothing without a marker or 404 status', () => {
+    const calls: [string, TrackOptions?][] = []
+    new NotFoundTracker((n, o) => calls.push([n, o])).enable()
+    expect(calls).toHaveLength(0)
   })
 })

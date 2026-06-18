@@ -86,7 +86,7 @@ pnpm add @vskstudio/takt-core
 ```ts
 import { init, track, pageview } from '@vskstudio/takt-core'
 
-init({ domain: 'example.com', outbound: true, files: true })
+init({ domain: 'example.com', outbound: true, files: true, notFound: true })
 
 track('Signup', {
   props: { plan: 'pro' },
@@ -112,11 +112,13 @@ takt.track('Signup', { props: { plan: 'pro' } })
 const stopSpa = takt.enableSpa()
 const stopOutbound = takt.enableOutbound()
 const stopFiles = takt.enableFiles(['pdf', 'zip', 'csv'])
+const stop404 = takt.enable404() // detects a 404 page once and reports it
 
 // later…
 stopSpa()
 stopOutbound()
 stopFiles()
+stop404()
 ```
 
 `createTakt()` is a pure factory (no side effects until you call a method), so it tree-shakes cleanly.

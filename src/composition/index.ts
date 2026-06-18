@@ -57,6 +57,7 @@ export interface InitOptions {
   outbound?: boolean
   files?: boolean
   fileExtensions?: string[]
+  notFound?: boolean
 }
 
 /**
@@ -82,6 +83,7 @@ export function init(opts: InitOptions = {}): Analytics {
 
   if (opts.outbound) _disposers.push(_instance.enableOutbound())
   if (opts.files) _disposers.push(_instance.enableFiles(opts.fileExtensions))
+  if (opts.notFound) _disposers.push(_instance.enable404())
   if (opts.auto !== false) {
     _disposers.push(_instance.enableSpa())
     _instance.pageview()
