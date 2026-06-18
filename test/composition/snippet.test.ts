@@ -86,27 +86,6 @@ describe('runSnippet', () => {
     expect(JSON.parse(last[1]).u).toBe('https://example.com/checkout')
   })
 
-  it('scrubs the destination url on outbound clicks and skips non-http protocols', () => {
-    runSnippet(scriptEl({ 'data-domain': 'snippet.test', 'data-outbound': '' }))
-    beaconMock.mockClear()
-
-    const mailto = document.createElement('a')
-    mailto.href = 'mailto:hi@other.com'
-    document.body.appendChild(mailto)
-    mailto.dispatchEvent(new MouseEvent('click', { bubbles: true }))
-    expect(beaconMock).not.toHaveBeenCalled()
-
-    const link = document.createElement('a')
-    link.href = 'https://other.com/path?token=secret'
-    document.body.appendChild(link)
-    link.dispatchEvent(new MouseEvent('click', { bubbles: true }))
-    const body = JSON.parse((beaconMock.mock.calls[0] as [string, string])[1])
-    expect(body).toMatchObject({ n: 'Outbound Link: Click', p: { url: 'https://other.com/path' } })
-
-    mailto.remove()
-    link.remove()
-  })
-
   it('does not send when opt-out is active (blocking test)', () => {
     localStorage.setItem('takt_ignore', '1')
     runSnippet(scriptEl({ 'data-domain': 'snippet.test' }))
@@ -128,11 +107,5 @@ describe('runSnippet', () => {
     })
     runSnippet(scriptEl({ 'data-domain': 'snippet.test', 'data-exclude-localhost': 'false' }))
     expect(beaconMock).toHaveBeenCalledOnce()
-  })
-
-  it('parses data-outbound/data-files as presence flags without throwing', () => {
-    expect(() =>
-      runSnippet(scriptEl({ 'data-domain': 'snippet.test', 'data-outbound': '', 'data-files': '' })),
-    ).not.toThrow()
   })
 })

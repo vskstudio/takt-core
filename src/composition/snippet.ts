@@ -1,12 +1,9 @@
 type TaktFn = ((name: string, opts?: unknown) => void) & { q?: unknown[][] }
 type Opts = { props?: Record<string, string>; revenue?: { amount: string; currency: string } } | undefined
 
-const FILE_RE = /\.(pdf|zip|xlsx|docx|mp4)$/
-
 // runSnippet is exported for testing; the IIFE tail below auto-runs it in the browser.
 export function runSnippet(el: HTMLScriptElement | null): void {
   const get = (k: string) => (el ? el.getAttribute(k) : null)
-  const has = (k: string) => !!el && el.hasAttribute(k)
 
   const domain = get('data-domain') || location.hostname
   // data-script-origin (first-party / anti-adblock) : origine d'où Takt sert
@@ -15,8 +12,6 @@ export function runSnippet(el: HTMLScriptElement | null): void {
   const origin = get('data-script-origin')
   const endpoint = get('data-endpoint') || (origin ? origin.replace(/\/+$/, '') + '/api/event' : '/api/event')
   const excl = get('data-exclude-localhost') !== 'false'
-  const outbound = has('data-outbound')
-  const files = has('data-files')
 
   // Always strips query + hash. The full SDK exposes trackQuery to keep it.
   const scrub = (raw: string) => {
@@ -52,19 +47,6 @@ export function runSnippet(el: HTMLScriptElement | null): void {
 
   function pv(): void { emit('pageview') }
 
-  if (outbound || files) {
-    document.addEventListener('click', (e) => {
-      const a = (e.target as Element)?.closest?.('a') as HTMLAnchorElement | null
-      if (!a?.href) return
-      let url: URL
-      try { url = new URL(a.href) } catch { return }
-      if (url.protocol.indexOf('http')) return
-      const dest = url.origin + url.pathname
-      if (outbound && url.hostname !== location.hostname) track('Outbound Link: Click', { props: { url: dest } })
-      if (files) { const m = FILE_RE.exec(url.pathname.toLowerCase()); if (m) track('File Download', { props: { url: dest, extension: m[1] } }) }
-    }, true)
-  }
-
   for (const k of ['pushState', 'replaceState'] as const) {
     const o = history[k]
     history[k] = function (this: History, ...a: Parameters<History['pushState']>) {
@@ -79,9 +61,4 @@ export function runSnippet(el: HTMLScriptElement | null): void {
   const q = win.takt?.q
   win.takt = track as TaktFn
   if (q) for (const a of q) track(...(a as [string, Opts?]))
-}
-
-if (typeof document !== 'undefined') {
-  const s = document.currentScript as HTMLScriptElement | null
-  if (s) runSnippet(s)
 }

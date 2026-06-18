@@ -47,11 +47,33 @@ Calls made before the script finishes loading are queued and replayed — instal
 | `data-domain` | Site identifier sent with every event | `location.hostname` |
 | `data-script-origin` | First-party origin to derive the endpoint from (`{origin}/api/event`) — your Takt domain or a custom domain to dodge ad-blockers | none |
 | `data-endpoint` | Ingestion endpoint (wins over `data-script-origin`) | `/api/event` |
-| `data-outbound` | Auto-track outbound link clicks (presence flag) | off |
-| `data-files` | Auto-track file downloads (presence flag) | off |
 | `data-exclude-localhost="false"` | Track localhost / private IPs | excluded |
 
-The snippet always respects Do Not Track and always strips the query string and hash from URLs. For per-query allowlisting, a custom scrubber, or to keep the query, use the npm build (`trackQuery` / `queryParams` / `scrubUrl` below).
+The base snippet stays under **1 kB gzip**: pageviews, SPA navigation, `window.takt()`, and the privacy guards — nothing more. It always respects Do Not Track and always strips the query string and hash from URLs. For per-query allowlisting, a custom scrubber, or to keep the query, use the npm build (`trackQuery` / `queryParams` / `scrubUrl` below).
+
+### Auto extensions — `takt.auto.js`
+
+Need outbound clicks, file downloads, HTML-declared events, or 404 detection without writing code? Swap `takt.js` for the opt-in `takt.auto.js` bundle and list what you want in `data-auto`:
+
+```html
+<script defer
+  src="https://cdn.jsdelivr.net/npm/@vskstudio/takt-core/dist/takt.auto.js"
+  data-domain="example.com"
+  data-auto="outbound,downloads,tagged,404"></script>
+```
+
+Without `data-auto`, `takt.auto.js` behaves exactly like `takt.js`. Each extension is opt-in.
+
+| `data-auto` value | Event sent | Property |
+| --- | --- | --- |
+| `outbound` | `Outbound Link: Click` | `url` |
+| `downloads` | `File Download` | `url` |
+| `404` | `404` | `path` |
+| `tagged` | custom (`data-takt-event`) | from `data-takt-prop-*` |
+
+- **downloads** default extensions: `pdf, xlsx, docx, pptx, csv, zip, gz, rar, 7z, dmg, exe, apk, mp3, mp4, wav, mov, avi, mkv, txt` — override with `data-downloads-ext="pdf,csv,epub"`.
+- **tagged**: add `data-takt-event="Cta"` to any clickable element; `data-takt-prop-<key>` attributes become props. The reserved name `pageview` is refused.
+- **404**: detected at load via the Navigation Timing API, or by adding `data-takt-404` to `<body>` / a `<meta name="takt:404">` tag on server-rendered error pages.
 
 ## npm
 
