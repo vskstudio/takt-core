@@ -51,7 +51,7 @@ Calls made before the script finishes loading are queued and replayed — instal
 | `data-enabled="false"` | Kill-switch — the tracker does nothing | enabled |
 | `data-respect-dnt="false"` | Opt out of the Do Not Track short-circuit | respected |
 | `data-sample-rate="0.5"` | Send only this fraction (0–1) of events | `1` (all) |
-| `data-track-query` | Keep the URL query string (default strips it) | stripped |
+| `data-track-query` | Keep the full query string and hash (default strips both) | stripped |
 | `data-query-params="utm_source,utm_medium"` | Keep only these query params | none |
 
 The base snippet stays under **1 kB gzip**: pageviews, SPA navigation, `window.takt()`, and the privacy guards — nothing more. It respects Do Not Track and strips the query string and hash from URLs by default; the attributes above tune both. For a custom scrubber function, use the npm build (`scrubUrl` below).

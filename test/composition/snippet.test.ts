@@ -127,12 +127,12 @@ describe('runSnippet', () => {
     expect(beaconMock).not.toHaveBeenCalled()
   })
 
-  it('keeps the query when data-track-query is present', () => {
+  it('keeps the full query and hash when data-track-query is present', () => {
     window.history.replaceState({}, '', 'https://example.com/checkout?utm_source=x#h')
     beaconMock.mockClear()
     runSnippet(scriptEl({ 'data-domain': 'snippet.test', 'data-track-query': 'true' }))
     const calls = beaconMock.mock.calls as [string, string][]
-    expect(JSON.parse(calls[calls.length - 1][1]).u).toBe('https://example.com/checkout?utm_source=x')
+    expect(JSON.parse(calls[calls.length - 1][1]).u).toBe('https://example.com/checkout?utm_source=x#h')
   })
 
   it('keeps only allow-listed params from data-query-params', () => {

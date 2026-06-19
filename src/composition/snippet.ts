@@ -20,12 +20,13 @@ export function runSnippet(el: HTMLScriptElement | null): void {
   const keepQuery = get('data-track-query') !== null
   const allow = (get('data-query-params') || '').split(',').map((s) => s.trim()).filter(Boolean)
 
-  // Default strips query + hash. Precedence: trackQuery (keep all) wins over the
-  // allowlist, which wins over the default strip — mirrors createUrlScrubber.
+  // Default strips query + hash. Precedence: trackQuery (keep the raw URL — query
+  // + hash) wins over the allowlist, which wins over the default strip — mirrors
+  // createUrlScrubber.
   const scrub = (raw: string) => {
+    if (keepQuery) return raw
     try {
       const u = new URL(raw)
-      if (keepQuery) return u.origin + u.pathname + u.search
       if (allow.length) {
         const kept = new URLSearchParams()
         for (const n of allow) { const v = u.searchParams.get(n); if (v !== null) kept.set(n, v) }
