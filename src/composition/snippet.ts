@@ -20,8 +20,8 @@ export function runSnippet(el: HTMLScriptElement | null): void {
   const keepQuery = get('data-track-query') !== null
   const allow = (get('data-query-params') || '').split(',').map((s) => s.trim()).filter(Boolean)
 
-  // Default strips query + hash. Order: trackQuery → allowlist → strip — mirrors
-  // the full SDK's createUrlScrubber.
+  // Default strips query + hash. Precedence: trackQuery (keep all) wins over the
+  // allowlist, which wins over the default strip — mirrors createUrlScrubber.
   const scrub = (raw: string) => {
     try {
       const u = new URL(raw)

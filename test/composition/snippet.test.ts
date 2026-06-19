@@ -79,7 +79,7 @@ describe('runSnippet', () => {
     expect(JSON.parse(last[1]).u).toBe('https://example.com/checkout')
   })
 
-  it('always strips the query (the inline snippet has no opt-out)', () => {
+  it('strips the query by default (no data-track-query or data-query-params)', () => {
     window.history.replaceState({}, '', 'https://example.com/checkout?utm_source=x')
     beaconMock.mockClear()
     runSnippet(scriptEl({ 'data-domain': 'snippet.test' }))
