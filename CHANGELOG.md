@@ -1,5 +1,14 @@
 # @vskstudio/takt-core
 
+## 0.5.0
+
+### Minor Changes
+
+- 7953536: Advanced tracker options. Snippet gains data-enabled, data-respect-dnt,
+  data-sample-rate, data-track-query and data-query-params. init() gains a
+  `tagged` autocapture option (via the new Analytics.enableTagged()), making the
+  SDK path a superset of the snippet.
+
 ## 0.3.1
 
 ### Patch Changes
