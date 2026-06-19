@@ -1,4 +1,5 @@
 import { runSnippet } from './snippet'
+import { readTaggedEvent } from '../domain/event/tagged'
 
 type Props = Record<string, string>
 type TaktFn = (name: string, opts?: { props?: Props }) => void
@@ -35,15 +36,8 @@ export function runAuto(el: HTMLScriptElement | null): void {
         const t = e.target as Element | null
 
         if (tagged) {
-          const tagEl = t?.closest?.('[data-takt-event]') as HTMLElement | null
-          if (tagEl) {
-            const name = tagEl.getAttribute('data-takt-event') || ''
-            const props: Props = {}
-            for (const a of Array.from(tagEl.attributes)) {
-              if (a.name.indexOf('data-takt-prop-') === 0) props[a.name.slice(15)] = a.value
-            }
-            takt(name, Object.keys(props).length ? { props } : undefined)
-          }
+          const ev = readTaggedEvent(t)
+          if (ev) takt(ev.name, ev.props ? { props: ev.props } : undefined)
         }
 
         if (!outbound && !downloads) return
