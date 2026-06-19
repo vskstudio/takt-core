@@ -11,9 +11,11 @@ function scriptEl(attrs: Record<string, string | null> = {}): HTMLScriptElement 
 
 describe('runSnippet', () => {
   let beaconMock: ReturnType<typeof vi.fn>
+  const realLocation = window.location
 
   beforeEach(() => {
     localStorage.clear()
+    Object.defineProperty(window, 'location', { value: realLocation, configurable: true })
     window.history.replaceState({}, '', 'https://example.com/')
     Object.defineProperty(navigator, 'doNotTrack', { value: '0', configurable: true })
     beaconMock = vi.fn(() => true)
@@ -107,5 +109,37 @@ describe('runSnippet', () => {
     })
     runSnippet(scriptEl({ 'data-domain': 'snippet.test', 'data-exclude-localhost': 'false' }))
     expect(beaconMock).toHaveBeenCalledOnce()
+  })
+
+  it('does nothing when data-enabled is false (kill-switch)', () => {
+    runSnippet(scriptEl({ 'data-domain': 'snippet.test', 'data-enabled': 'false' }))
+    expect(beaconMock).not.toHaveBeenCalled()
+  })
+
+  it('sends despite Do Not Track when data-respect-dnt is false', () => {
+    vi.stubGlobal('navigator', { sendBeacon: beaconMock, doNotTrack: '1' })
+    runSnippet(scriptEl({ 'data-domain': 'snippet.test', 'data-respect-dnt': 'false' }))
+    expect(beaconMock).toHaveBeenCalledOnce()
+  })
+
+  it('drops every event when data-sample-rate is 0', () => {
+    runSnippet(scriptEl({ 'data-domain': 'snippet.test', 'data-sample-rate': '0' }))
+    expect(beaconMock).not.toHaveBeenCalled()
+  })
+
+  it('keeps the query when data-track-query is present', () => {
+    window.history.replaceState({}, '', 'https://example.com/checkout?utm_source=x#h')
+    beaconMock.mockClear()
+    runSnippet(scriptEl({ 'data-domain': 'snippet.test', 'data-track-query': 'true' }))
+    const calls = beaconMock.mock.calls as [string, string][]
+    expect(JSON.parse(calls[calls.length - 1][1]).u).toBe('https://example.com/checkout?utm_source=x')
+  })
+
+  it('keeps only allow-listed params from data-query-params', () => {
+    window.history.replaceState({}, '', 'https://example.com/p?utm_source=x&secret=y')
+    beaconMock.mockClear()
+    runSnippet(scriptEl({ 'data-domain': 'snippet.test', 'data-query-params': 'utm_source' }))
+    const calls = beaconMock.mock.calls as [string, string][]
+    expect(JSON.parse(calls[calls.length - 1][1]).u).toBe('https://example.com/p?utm_source=x')
   })
 })
