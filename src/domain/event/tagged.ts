@@ -13,7 +13,11 @@ export function readTaggedEvent(el: Element | null): TaggedEvent | null {
   if (!name) return null
   const props: Record<string, string> = {}
   for (const a of Array.from(tagEl.attributes)) {
-    if (a.name.indexOf(PREFIX) === 0) props[a.name.slice(PREFIX.length)] = a.value
+    if (a.name.indexOf(PREFIX) !== 0) continue
+    const key = a.name.slice(PREFIX.length)
+    // Drop empty keys/values to match the SDK's Props sanitizer, so the snippet
+    // and SDK tagged paths emit identical payloads.
+    if (key && a.value) props[key] = a.value
   }
   return Object.keys(props).length ? { name, props } : { name }
 }
