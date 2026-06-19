@@ -15,4 +15,12 @@ export class DocumentClickSource implements ClickSource {
     document.addEventListener('click', handler, true)
     return () => document.removeEventListener('click', handler, true)
   }
+
+  onElementClick(cb: (target: Element, e: Event) => void): () => void {
+    const handler = (e: Event) => {
+      if (e.target instanceof Element) cb(e.target, e)
+    }
+    document.addEventListener('click', handler, true)
+    return () => document.removeEventListener('click', handler, true)
+  }
 }

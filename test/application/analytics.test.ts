@@ -44,6 +44,7 @@ function fakeClick(): { click: ClickSource; trigger: (a: HTMLAnchorElement) => v
   let cb: ((a: HTMLAnchorElement, e: Event) => void) | null = null
   const click: ClickSource = {
     onAnchorClick: (handler) => { cb = handler; return () => { cb = null } },
+    onElementClick: () => () => {},
   }
   return { click, trigger: (a) => cb?.(a, new Event('click')) }
 }

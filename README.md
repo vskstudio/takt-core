@@ -24,7 +24,7 @@
 <script defer src="https://cdn.jsdelivr.net/npm/@vskstudio/takt-core/dist/takt.js" data-domain="example.com"></script>
 ```
 
-> Pin a version in production, e.g. `@vskstudio/takt-core@0.1.0`. jsDelivr and unpkg both serve the snippet straight from npm — no extra hosting required.
+> Pin a version in production, e.g. `@vskstudio/takt-core@0.5.0`. jsDelivr and unpkg both serve the snippet straight from npm — no extra hosting required.
 
 Then, anywhere on the page:
 
@@ -48,8 +48,13 @@ Calls made before the script finishes loading are queued and replayed — instal
 | `data-script-origin` | First-party origin to derive the endpoint from (`{origin}/api/event`) — your Takt domain or a custom domain to dodge ad-blockers | none |
 | `data-endpoint` | Ingestion endpoint (wins over `data-script-origin`) | `/api/event` |
 | `data-exclude-localhost="false"` | Track localhost / private IPs | excluded |
+| `data-enabled="false"` | Kill-switch — the tracker does nothing | enabled |
+| `data-respect-dnt="false"` | Opt out of the Do Not Track short-circuit | respected |
+| `data-sample-rate="0.5"` | Send only this fraction (0–1) of events | `1` (all) |
+| `data-track-query` | Keep the full query string and hash (default strips both) | stripped |
+| `data-query-params="utm_source,utm_medium"` | Keep only these query params | none |
 
-The base snippet stays under **1 kB gzip**: pageviews, SPA navigation, `window.takt()`, and the privacy guards — nothing more. It always respects Do Not Track and always strips the query string and hash from URLs. For per-query allowlisting, a custom scrubber, or to keep the query, use the npm build (`trackQuery` / `queryParams` / `scrubUrl` below).
+The base snippet stays under **1 kB gzip**: pageviews, SPA navigation, `window.takt()`, and the privacy guards — nothing more. It respects Do Not Track and strips the query string and hash from URLs by default; the attributes above tune both. For a custom scrubber function, use the npm build (`scrubUrl` below).
 
 ### Auto extensions — `takt.auto.js`
 
@@ -72,7 +77,7 @@ Without `data-auto`, `takt.auto.js` behaves exactly like `takt.js`. Each extensi
 | `tagged` | custom (`data-takt-event`) | from `data-takt-prop-*` |
 
 - **downloads** default extensions: `pdf, xlsx, docx, pptx, csv, zip, gz, rar, 7z, dmg, exe, apk, mp3, mp4, wav, mov, avi, mkv, txt` — override with `data-downloads-ext="pdf,csv,epub"`.
-- **tagged**: add `data-takt-event="Cta"` to any clickable element; `data-takt-prop-<key>` attributes become props. The reserved name `pageview` is refused.
+- **tagged**: add `data-takt-event="Cta"` to any clickable element; `data-takt-prop-<key>` attributes become props (empty keys/values are ignored). The reserved name `pageview` is refused. Identical to `init({ tagged: true })` on the SDK.
 - **404**: detected at load via the Navigation Timing API, or by adding `data-takt-404` to `<body>` / a `<meta name="takt:404">` tag on server-rendered error pages.
 
 ## npm
@@ -96,6 +101,8 @@ track('Signup', {
 
 `init()` creates a single shared instance, fires an automatic pageview, and wires SPA navigation. `track`, `pageview`, `optOut`, and `optIn` delegate to it.
 
+Autocapture toggles — `outbound`, `files`, `notFound`, and `tagged` — opt into the same extensions as the snippet's `data-auto`: outbound-link clicks, file downloads, 404 detection, and `data-takt-event` custom events. `tagged: true` tracks clicks on elements carrying `data-takt-event` (with `data-takt-prop-*` becoming props), matching `data-auto=tagged`.
+
 ### Instance API — `createTakt`
 
 For full control (multiple instances, no globals, explicit teardown), construct an instance directly:
@@ -113,12 +120,14 @@ const stopSpa = takt.enableSpa()
 const stopOutbound = takt.enableOutbound()
 const stopFiles = takt.enableFiles(['pdf', 'zip', 'csv'])
 const stop404 = takt.enable404() // detects a 404 page once and reports it
+const stopTagged = takt.enableTagged() // custom events from data-takt-event
 
 // later…
 stopSpa()
 stopOutbound()
 stopFiles()
 stop404()
+stopTagged()
 ```
 
 `createTakt()` is a pure factory (no side effects until you call a method), so it tree-shakes cleanly.
