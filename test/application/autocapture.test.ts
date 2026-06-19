@@ -152,4 +152,15 @@ describe('TaggedEventTracker', () => {
     triggerEl(document.createElement('span'))
     expect(calls).toHaveLength(0)
   })
+
+  it('disposer stops further events', () => {
+    const { source, triggerEl } = fakeClick()
+    const calls: [string, TrackOptions?][] = []
+    const dispose = new TaggedEventTracker(source, (n, o) => calls.push([n, o])).enable()
+    const btn = document.createElement('button')
+    btn.setAttribute('data-takt-event', 'Cta')
+    dispose()
+    triggerEl(btn)
+    expect(calls).toHaveLength(0)
+  })
 })
