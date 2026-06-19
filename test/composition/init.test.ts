@@ -124,6 +124,30 @@ describe('composition/index init()', () => {
     expect(beaconMock).not.toHaveBeenCalled()
   })
 
+  it('enables tagged autocapture when tagged is true', () => {
+    init({ domain: 'example.com', auto: false, tagged: true })
+    beaconMock.mockClear()
+    const btn = document.createElement('button')
+    btn.setAttribute('data-takt-event', 'Cta')
+    btn.setAttribute('data-takt-prop-zone', 'hero')
+    document.body.appendChild(btn)
+    btn.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+    btn.remove()
+    const body = JSON.parse((beaconMock.mock.calls[0] as [string, string])[1])
+    expect(body).toMatchObject({ n: 'Cta', p: { zone: 'hero' } })
+  })
+
+  it('does not enable tagged autocapture by default', () => {
+    init({ domain: 'example.com', auto: false })
+    beaconMock.mockClear()
+    const btn = document.createElement('button')
+    btn.setAttribute('data-takt-event', 'Cta')
+    document.body.appendChild(btn)
+    btn.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+    btn.remove()
+    expect(beaconMock).not.toHaveBeenCalled()
+  })
+
   it('re-initialising disposes the previous SPA listener (no double pageview)', () => {
     init({ domain: 'example.com', auto: true })
     expect(beaconMock).toHaveBeenCalledOnce() // first pageview
