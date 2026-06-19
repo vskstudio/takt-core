@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest'
 import { OutboundLinkTracker } from '../../src/application/autocapture/OutboundLinkTracker'
 import { FileDownloadTracker } from '../../src/application/autocapture/FileDownloadTracker'
 import { NotFoundTracker } from '../../src/application/autocapture/NotFoundTracker'
+import { TaggedEventTracker } from '../../src/application/autocapture/TaggedEventTracker'
 import type { ClickSource } from '../../src/application/ports/ClickSource'
 import type { EnvironmentProvider } from '../../src/application/ports/EnvironmentProvider'
 import type { TrackOptions } from '../../src/application/Analytics'
@@ -9,10 +10,16 @@ import type { TrackOptions } from '../../src/application/Analytics'
 // --- Fakes ---
 function fakeClick() {
   let cb: ((a: HTMLAnchorElement, e: Event) => void) | null = null
+  let elCb: ((t: Element, e: Event) => void) | null = null
   const source: ClickSource = {
     onAnchorClick: (handler) => { cb = handler; return () => { cb = null } },
+    onElementClick: (handler) => { elCb = handler; return () => { elCb = null } },
   }
-  return { source, trigger: (a: HTMLAnchorElement) => cb?.(a, new Event('click')) }
+  return {
+    source,
+    trigger: (a: HTMLAnchorElement) => cb?.(a, new Event('click')),
+    triggerEl: (t: Element) => elCb?.(t, new Event('click')),
+  }
 }
 
 function fakeEnv(hostname = 'example.com'): EnvironmentProvider {
@@ -122,6 +129,27 @@ describe('NotFoundTracker', () => {
   it('does nothing without a marker or 404 status', () => {
     const calls: [string, TrackOptions?][] = []
     new NotFoundTracker((n, o) => calls.push([n, o])).enable()
+    expect(calls).toHaveLength(0)
+  })
+})
+
+describe('TaggedEventTracker', () => {
+  it('fires the tagged event name with data-takt-prop-* props', () => {
+    const { source, triggerEl } = fakeClick()
+    const calls: [string, TrackOptions?][] = []
+    new TaggedEventTracker(source, (n, o) => calls.push([n, o])).enable()
+    const btn = document.createElement('button')
+    btn.setAttribute('data-takt-event', 'Cta')
+    btn.setAttribute('data-takt-prop-zone', 'hero')
+    triggerEl(btn)
+    expect(calls).toEqual([['Cta', { props: { zone: 'hero' } }]])
+  })
+
+  it('does nothing for elements without data-takt-event', () => {
+    const { source, triggerEl } = fakeClick()
+    const calls: [string, TrackOptions?][] = []
+    new TaggedEventTracker(source, (n, o) => calls.push([n, o])).enable()
+    triggerEl(document.createElement('span'))
     expect(calls).toHaveLength(0)
   })
 })
