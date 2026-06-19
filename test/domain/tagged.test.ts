@@ -32,4 +32,8 @@ describe('readTaggedEvent', () => {
   it('returns null when the name attribute is empty', () => {
     expect(readTaggedEvent(el({ 'data-takt-event': '' }))).toBeNull()
   })
+
+  it('returns null when the name attribute is whitespace only', () => {
+    expect(readTaggedEvent(el({ 'data-takt-event': '   ' }))).toBeNull()
+  })
 })

@@ -9,7 +9,7 @@ const PREFIX = 'data-takt-prop-'
 export function readTaggedEvent(el: Element | null): TaggedEvent | null {
   const tagEl = el?.closest?.('[data-takt-event]') as HTMLElement | null
   if (!tagEl) return null
-  const name = tagEl.getAttribute('data-takt-event') || ''
+  const name = (tagEl.getAttribute('data-takt-event') || '').trim()
   if (!name) return null
   const props: Record<string, string> = {}
   for (const a of Array.from(tagEl.attributes)) {
