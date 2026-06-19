@@ -135,6 +135,14 @@ describe('runSnippet', () => {
     expect(JSON.parse(calls[calls.length - 1][1]).u).toBe('https://example.com/checkout?utm_source=x#h')
   })
 
+  it('strips the query when data-track-query is explicitly "false" (SDK parity)', () => {
+    window.history.replaceState({}, '', 'https://example.com/checkout?token=secret#h')
+    beaconMock.mockClear()
+    runSnippet(scriptEl({ 'data-domain': 'snippet.test', 'data-track-query': 'false' }))
+    const calls = beaconMock.mock.calls as [string, string][]
+    expect(JSON.parse(calls[calls.length - 1][1]).u).toBe('https://example.com/checkout')
+  })
+
   it('keeps only allow-listed params from data-query-params', () => {
     window.history.replaceState({}, '', 'https://example.com/p?utm_source=x&secret=y')
     beaconMock.mockClear()

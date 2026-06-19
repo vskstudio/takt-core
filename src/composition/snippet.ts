@@ -17,7 +17,7 @@ export function runSnippet(el: HTMLScriptElement | null): void {
   const excl = get('data-exclude-localhost') !== 'false'
   const dnt = get('data-respect-dnt') !== 'false'
   const rate = parseFloat(get('data-sample-rate') || '1')
-  const keepQuery = get('data-track-query') !== null
+  const keepQuery = (get('data-track-query') ?? 'false') !== 'false'
   const allow = (get('data-query-params') || '').split(',').map((s) => s.trim()).filter(Boolean)
 
   // Default strips query + hash. Precedence: trackQuery (keep the raw URL — query
