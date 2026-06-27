@@ -45,7 +45,7 @@ export function runAuto(el: HTMLScriptElement | null): void {
         if (!a?.href) return
         let url: URL
         try { url = new URL(a.href) } catch { return }
-        if (url.protocol.indexOf('http')) return
+        if (url.protocol !== 'http:' && url.protocol !== 'https:') return
         const dest = url.origin + url.pathname
         if (outbound && url.hostname !== location.hostname) takt('Outbound Link: Click', { props: { url: dest } })
         if (downloads && fileRe.test(url.pathname.toLowerCase())) takt('File Download', { props: { url: dest } })
