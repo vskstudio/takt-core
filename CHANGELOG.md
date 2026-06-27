@@ -1,5 +1,13 @@
 # @vskstudio/takt-core
 
+## 0.5.1
+
+### Patch Changes
+
+- Harden outbound/download autocapture: the link protocol is now matched
+  explicitly against `http:`/`https:` instead of the fragile
+  `protocol.indexOf('http')` test, so only real web links are ever reported.
+
 ## 0.5.0
 
 ### Minor Changes
