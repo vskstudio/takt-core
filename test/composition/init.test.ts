@@ -33,6 +33,11 @@ describe('composition/index init()', () => {
     expect(body).toMatchObject({ n: 'pageview', d: 'example.com' })
   })
 
+  it('defaults the endpoint to the hosted Takt origin', () => {
+    init({ domain: 'example.com', auto: true })
+    expect((beaconMock.mock.calls[0] as [string, string])[0]).toBe('https://taktlytics.com/api/event')
+  })
+
   it('derives the endpoint from scriptOrigin (first-party)', () => {
     init({ domain: 'example.com', scriptOrigin: 'https://stats.example.com/', auto: true })
     expect((beaconMock.mock.calls[0] as [string, string])[0]).toBe('https://stats.example.com/api/event')

@@ -7,6 +7,7 @@ import { WindowEnvironmentProvider } from '../infrastructure/browser/WindowEnvir
 import { HistoryNavigationProvider } from '../infrastructure/browser/HistoryNavigationProvider'
 import { DocumentClickSource } from '../infrastructure/browser/DocumentClickSource'
 import createUrlScrubber, { type UrlScrubber } from '../domain/url/UrlScrubber'
+import { DEFAULT_TAKT_ORIGIN } from '../defaults'
 
 /** Configuration for {@link createTakt} — the core SDK without the autocapture toggles. */
 export interface Config {
@@ -24,15 +25,15 @@ export interface Config {
 }
 
 /**
- * Resolve the ingest endpoint. `endpoint` wins if given; otherwise, when a
- * `scriptOrigin` is set (first-party / anti-adblock: the Takt domain or a custom
- * domain), derive `${origin}/api/event`. Falls back to a same-origin relative
- * path.
+ * Resolve the ingest endpoint. `endpoint` wins if given; otherwise derive
+ * `${origin}/api/event` from `scriptOrigin` (first-party / anti-adblock: a custom
+ * domain you proxy through) — or, with neither set, from the hosted Takt origin
+ * so the SaaS case works with no config. Pass `endpoint: '/api/event'` for a pure
+ * same-origin first-party proxy.
  */
 export function resolveEndpoint(endpoint?: string, scriptOrigin?: string): string {
   if (endpoint) return endpoint
-  if (scriptOrigin) return scriptOrigin.replace(/\/+$/, '') + '/api/event'
-  return '/api/event'
+  return (scriptOrigin || DEFAULT_TAKT_ORIGIN).replace(/\/+$/, '') + '/api/event'
 }
 
 /**

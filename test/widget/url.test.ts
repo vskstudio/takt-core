@@ -2,8 +2,8 @@ import { describe, it, expect } from 'vitest'
 import { badgeUrl, embedUrl } from '../../src/composition/index'
 
 describe('widget/url badgeUrl', () => {
-  it('omits default params', () => {
-    expect(badgeUrl('example.com')).toBe('/public/example.com/badge.svg')
+  it('omits default params and defaults to the hosted Takt origin', () => {
+    expect(badgeUrl('example.com')).toBe('https://taktlytics.com/public/example.com/badge.svg')
   })
 
   it('keeps non-default variant/glyph/lang and respects host', () => {
@@ -14,18 +14,18 @@ describe('widget/url badgeUrl', () => {
 
   it('drops default variant a and lang fr but keeps glyph', () => {
     expect(badgeUrl('a.com', { variant: 'a', lang: 'fr', glyph: 'dash' })).toBe(
-      '/public/a.com/badge.svg?glyph=dash',
+      'https://taktlytics.com/public/a.com/badge.svg?glyph=dash',
     )
   })
 
   it('encodes the domain', () => {
-    expect(badgeUrl('foo bar.com')).toBe('/public/foo%20bar.com/badge.svg')
+    expect(badgeUrl('foo bar.com')).toBe('https://taktlytics.com/public/foo%20bar.com/badge.svg')
   })
 })
 
 describe('widget/url embedUrl', () => {
-  it('omits default params', () => {
-    expect(embedUrl('example.com')).toBe('/embed/example.com')
+  it('omits default params and defaults to the hosted Takt origin', () => {
+    expect(embedUrl('example.com')).toBe('https://taktlytics.com/embed/example.com')
   })
 
   it('keeps non-default theme/lang and respects host', () => {
@@ -35,7 +35,7 @@ describe('widget/url embedUrl', () => {
   })
 
   it('encodes the domain', () => {
-    expect(embedUrl('foo bar.com')).toBe('/embed/foo%20bar.com')
+    expect(embedUrl('foo bar.com')).toBe('https://taktlytics.com/embed/foo%20bar.com')
   })
 
   it('strips a trailing slash on host', () => {

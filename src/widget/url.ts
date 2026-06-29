@@ -2,8 +2,11 @@
 // and the embed iframe (`/embed/{domain}`). The framework wrappers (`Badge`/`Embed`) build
 // their `src` from these so the allow-listed params stay in one place.
 //
-// `host` defaults to '' (same-origin / relative), mirroring the SDK's relative `endpoint`.
-// External sites point it at their Takt host, e.g. `host: 'https://takt.example.com'`.
+// `host` defaults to the hosted Takt origin, mirroring the SDK's ingest default.
+// Self-hosters / first-party proxies point it at their own Takt host, e.g.
+// `host: 'https://takt.example.com'`.
+
+import { DEFAULT_TAKT_ORIGIN } from '../defaults'
 
 export type BadgeVariant = 'a' | 'b' | 'd'
 export type BadgeGlyph = 'unplug' | 'dash' | 'off' | 'eyeoff'
@@ -27,7 +30,7 @@ export interface EmbedOptions {
 // Rejecting everything else stops `javascript:`/`data:`/protocol-relative (`//evil`)
 // values from flowing into an <img>/<iframe> `src` or a fetch() in the wrappers.
 export function normalizeHost(host?: string): string {
-  if (!host) return ''
+  if (!host) return DEFAULT_TAKT_ORIGIN
   let url: URL
   try {
     url = new URL(host)

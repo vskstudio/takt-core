@@ -1,3 +1,5 @@
+import { DEFAULT_TAKT_ORIGIN } from '../defaults'
+
 type TaktFn = ((name: string, opts?: unknown) => void) & { q?: unknown[][] }
 type Opts = { props?: Record<string, string>; revenue?: { amount: string; currency: string } } | undefined
 
@@ -10,10 +12,10 @@ export function runSnippet(el: HTMLScriptElement | null): void {
 
   const domain = get('data-domain') || location.hostname
   // data-script-origin (first-party / anti-adblock) : origine d'où Takt sert
-  // l'ingest (domaine Takt ou domaine custom du client). data-endpoint reste
-  // prioritaire ; sinon on dérive {origin}/api/event, défaut relatif.
-  const origin = get('data-script-origin')
-  const endpoint = get('data-endpoint') || (origin ? origin.replace(/\/+$/, '') + '/api/event' : '/api/event')
+  // l'ingest (domaine custom proxifié par le client). data-endpoint reste
+  // prioritaire ; sinon on dérive {origin}/api/event, défaut l'origine Takt hébergée.
+  const origin = get('data-script-origin') || DEFAULT_TAKT_ORIGIN
+  const endpoint = get('data-endpoint') || origin.replace(/\/+$/, '') + '/api/event'
   const excl = get('data-exclude-localhost') !== 'false'
   const dnt = get('data-respect-dnt') !== 'false'
   const rate = parseFloat(get('data-sample-rate') || '1')
