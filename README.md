@@ -45,8 +45,8 @@ Calls made before the script finishes loading are queued and replayed — instal
 | Attribute | Effect | Default |
 | --- | --- | --- |
 | `data-domain` | Site identifier sent with every event | `location.hostname` |
-| `data-script-origin` | First-party origin to derive the endpoint from (`{origin}/api/event`) — your Takt domain or a custom domain to dodge ad-blockers | none |
-| `data-endpoint` | Ingestion endpoint (wins over `data-script-origin`) | `/api/event` |
+| `data-script-origin` | First-party origin to derive the endpoint from (`{origin}/api/event`) — a custom domain you proxy through to dodge ad-blockers | hosted Takt origin |
+| `data-endpoint` | Ingestion endpoint (wins over `data-script-origin`); set `/api/event` for a same-origin first-party proxy | `https://taktlytics.com/api/event` |
 | `data-exclude-localhost="false"` | Track localhost / private IPs | excluded |
 | `data-enabled="false"` | Kill-switch — the tracker does nothing | enabled |
 | `data-respect-dnt="false"` | Opt out of the Do Not Track short-circuit | respected |
@@ -110,7 +110,7 @@ For full control (multiple instances, no globals, explicit teardown), construct 
 ```ts
 import { createTakt } from '@vskstudio/takt-core'
 
-const takt = createTakt({ domain: 'example.com', endpoint: '/api/event' })
+const takt = createTakt({ domain: 'example.com' })
 
 takt.pageview()
 takt.track('Signup', { props: { plan: 'pro' } })
@@ -139,8 +139,8 @@ stopTagged()
 | Option | Type | Default | Effect |
 | --- | --- | --- | --- |
 | `domain` | `string` | `location.hostname` | Site identifier sent with every event |
-| `scriptOrigin` | `string` | none | First-party origin to derive the endpoint from (`{origin}/api/event`) — your Takt domain or a custom domain to dodge ad-blockers |
-| `endpoint` | `string` | `/api/event` | Ingestion endpoint (wins over `scriptOrigin`) |
+| `scriptOrigin` | `string` | hosted Takt origin | First-party origin to derive the endpoint from (`{origin}/api/event`) — a custom domain you proxy through to dodge ad-blockers |
+| `endpoint` | `string` | `https://taktlytics.com/api/event` | Ingestion endpoint (wins over `scriptOrigin`); set `/api/event` for a same-origin first-party proxy |
 | `enabled` | `boolean` | `true` | Master switch — when `false`, nothing is sent |
 | `debug` | `boolean` | `false` | Log each payload to the console before sending |
 | `sampleRate` | `number` | `1` | Keep this fraction of events (e.g. `0.25` ≈ 25%) |
@@ -174,11 +174,11 @@ import { badgeUrl, embedUrl, createStats } from '@vskstudio/takt-core'
 
 // URL builders for the server-rendered badge SVG and embed iframe.
 badgeUrl('example.com', { variant: 'd', glyph: 'off', lang: 'en' })
-// → /public/example.com/badge.svg?variant=d&glyph=off&lang=en
+// → https://taktlytics.com/public/example.com/badge.svg?variant=d&glyph=off&lang=en
 embedUrl('example.com', { theme: 'dark' })
-// → /embed/example.com?theme=dark
+// → https://taktlytics.com/embed/example.com?theme=dark
 
-// Anonymous client for the public stats API. Pass `host` for a remote Takt.
+// Anonymous client for the public stats API. Pass `host` for a self-hosted Takt.
 const stats = createStats({ host: 'https://takt.example.com', domain: 'example.com' })
 await stats.summary(undefined, { period: '30d', compare: 'previous' })
 await stats.timeseries()
@@ -186,7 +186,7 @@ await stats.realtime()
 await stats.breakdown('page')
 ```
 
-`host` defaults to `''` (same-origin), matching the SDK's relative `endpoint`.
+`host` defaults to the hosted Takt origin, matching the SDK's ingest default.
 When set, it must be an absolute `http(s)://` origin — anything else
 (`javascript:`, `data:`, protocol-relative `//…`) is rejected, so a `host`
 value can never smuggle a non-http scheme into a widget `src` or a `fetch`.

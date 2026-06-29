@@ -31,7 +31,7 @@ describe('stats/client', () => {
     const stats = createStats({ domain: 'a.com' })
     expect((await stats.realtime()).visitors).toBe(7)
     expect(f).toHaveBeenCalledWith(
-      '/api/v1/public/sites/a.com/stats/realtime',
+      'https://taktlytics.com/api/v1/public/sites/a.com/stats/realtime',
       expect.anything(),
     )
   })
@@ -57,7 +57,7 @@ describe('stats/client', () => {
     const stats = createStats({ domain: 'a.com' })
     await stats.breakdown('page', undefined, { period: '7d', country: 'FR' })
     expect(f).toHaveBeenCalledWith(
-      '/api/v1/public/sites/a.com/stats/breakdown?dimension=page&period=7d&country=FR',
+      'https://taktlytics.com/api/v1/public/sites/a.com/stats/breakdown?dimension=page&period=7d&country=FR',
       expect.anything(),
     )
   })

@@ -69,7 +69,7 @@ export interface StatsParams {
 }
 
 export interface StatsClientOptions {
-  /** Takt host, e.g. `https://takt.example.com`. Defaults to '' (same-origin). */
+  /** Takt host, e.g. `https://takt.example.com`. Defaults to the hosted Takt origin. */
   host?: string
   /** Default domain so per-call `domain` becomes optional. */
   domain?: string
