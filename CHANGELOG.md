@@ -1,5 +1,11 @@
 # @vskstudio/takt-core
 
+## 0.8.1
+
+### Patch Changes
+
+- f29e9ae: Harden `exclude`: normalize entries once (strip trailing slashes, drop empty strings) so `'/app/'` still excludes the bare `/app` and a stray `''` can never blanket-block every path.
+
 ## 0.8.0
 
 ### Minor Changes
