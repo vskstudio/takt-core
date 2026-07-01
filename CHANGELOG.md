@@ -1,5 +1,11 @@
 # @vskstudio/takt-core
 
+## 0.7.0
+
+### Minor Changes
+
+- 06a4bc4: Honor the Global Privacy Control signal (`navigator.globalPrivacyControl`) alongside Do Not Track in the full SDK: when `respectDnt` is on (default), visitors sending GPC are never tracked. The minimal CDN snippet stays within its ≤ 1 kB budget and relies on server-side `Sec-GPC` enforcement (GPC browsers auto-send the header on the beacon).
+
 ## 0.6.0
 
 ### Minor Changes
