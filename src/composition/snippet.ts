@@ -42,8 +42,10 @@ export function runSnippet(el: HTMLScriptElement | null): void {
   // Frozen short-circuit order: opt-out → DNT → localhost → sampling.
   function emit(name: string, opts?: Opts): void {
     try { if (localStorage.getItem('takt_ignore') === '1') return } catch { /* noop */ }
-    // Standard DNT value only; the full SDK also honors the legacy 'yes'
-    // (old Firefox/Safari) — omitted here to stay within the ≤ 1 kB budget.
+    // Standard DNT value only. The full SDK also honors the legacy DNT 'yes'
+    // (old Firefox/Safari) and Global Privacy Control (navigator.globalPrivacyControl);
+    // both are omitted here to stay within the ≤ 1 kB budget. GPC stays enforced:
+    // GPC browsers auto-send the Sec-GPC header on the beacon, which the ingest drops.
     if (dnt && navigator.doNotTrack === '1') return
     if (excl) {
       const h = location.hostname
