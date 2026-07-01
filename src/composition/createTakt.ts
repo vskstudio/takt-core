@@ -16,6 +16,7 @@ export interface Config {
   scriptOrigin?: string
   respectDnt?: boolean
   excludeLocalhost?: boolean
+  exclude?: string[]
   enabled?: boolean
   debug?: boolean
   sampleRate?: number
@@ -46,6 +47,7 @@ export function createTakt(config: Config = {}): Analytics {
     endpoint: resolveEndpoint(config.endpoint, config.scriptOrigin),
     respectDnt: config.respectDnt ?? true,
     excludeLocalhost: config.excludeLocalhost ?? true,
+    exclude: config.exclude ?? [],
     enabled: config.enabled ?? true,
     debug: config.debug ?? false,
     sampleRate: config.sampleRate ?? 1,

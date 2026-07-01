@@ -27,6 +27,7 @@ export interface AnalyticsConfig {
   endpoint: string
   respectDnt: boolean
   excludeLocalhost: boolean
+  exclude: string[]
   enabled: boolean
   debug: boolean
   sampleRate: number

@@ -26,6 +26,7 @@ const fakeDnt = (enabled = false): DoNotTrackProvider => ({ isEnabled: () => ena
 function fakeEnv(hostname = 'example.com'): EnvironmentProvider {
   return {
     hostname: () => hostname,
+    path: () => '/test',
     url: () => `https://${hostname}/test`,
     referrer: () => 'https://ref.io/',
     width: () => 1024,
@@ -54,6 +55,7 @@ const defaultConfig = {
   endpoint: '/api/event',
   respectDnt: true,
   excludeLocalhost: true,
+  exclude: [] as string[],
   enabled: true,
   debug: false,
   sampleRate: 1,

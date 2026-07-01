@@ -18,20 +18,27 @@ function fakeDnt(enabled = false): DoNotTrackProvider {
   return { isEnabled: () => enabled }
 }
 
-function fakeEnv(hostname = 'example.com'): EnvironmentProvider {
+function fakeEnv(hostname = 'example.com', path = '/'): EnvironmentProvider {
   return {
     hostname: () => hostname,
-    url: () => `https://${hostname}/`,
+    path: () => path,
+    url: () => `https://${hostname}${path}`,
     referrer: () => '',
     width: () => 1280,
   }
 }
 
 const cfg = (
-  over: Partial<{ respectDnt: boolean; excludeLocalhost: boolean; sampleRate: number }> = {},
+  over: Partial<{
+    respectDnt: boolean
+    excludeLocalhost: boolean
+    exclude: string[]
+    sampleRate: number
+  }> = {},
 ) => ({
   respectDnt: true,
   excludeLocalhost: true,
+  exclude: [] as string[],
   sampleRate: 1,
   ...over,
 })
@@ -101,6 +108,30 @@ describe('TrackingPolicy.isBlocked()', () => {
 
   it('blocks on RFC-1918 172.16-31.x', () => {
     const policy = new TrackingPolicy(fakeConsent(), fakeDnt(), fakeEnv('172.16.0.1'), cfg())
+    expect(policy.isBlocked()).toBe(true)
+  })
+
+  it('blocks an excluded path prefix (short-circuit 4)', () => {
+    const policy = new TrackingPolicy(
+      fakeConsent(), fakeDnt(), fakeEnv('example.com', '/app/sites/x'),
+      cfg({ exclude: ['/app', '/invite'] }),
+    )
+    expect(policy.isBlocked()).toBe(true)
+  })
+
+  it('bounds exclusion to the segment (/application is not excluded by /app)', () => {
+    const policy = new TrackingPolicy(
+      fakeConsent(), fakeDnt(), fakeEnv('example.com', '/application'),
+      cfg({ exclude: ['/app'] }),
+    )
+    expect(policy.isBlocked()).toBe(false)
+  })
+
+  it('matches the exact excluded path', () => {
+    const policy = new TrackingPolicy(
+      fakeConsent(), fakeDnt(), fakeEnv('example.com', '/app'),
+      cfg({ exclude: ['/app'] }),
+    )
     expect(policy.isBlocked()).toBe(true)
   })
 

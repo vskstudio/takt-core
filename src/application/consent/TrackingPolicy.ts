@@ -5,10 +5,14 @@ import type { EnvironmentProvider } from '../ports/EnvironmentProvider'
 export interface TrackingPolicyConfig {
   respectDnt: boolean
   excludeLocalhost: boolean
+  // Path prefixes never tracked (e.g. an authenticated dashboard or token-bearing
+  // pages). Segment-bounded: '/app' excludes '/app' and '/app/…' but not
+  // '/application'. Applies to pageviews and named events alike.
+  exclude: string[]
   sampleRate: number
 }
 
-// Frozen short-circuit order: opt-out → DNT → localhost → sampling.
+// Frozen short-circuit order: opt-out → DNT → localhost → exclude → sampling.
 export class TrackingPolicy {
   constructor(
     private readonly consent: ConsentStore,
@@ -22,7 +26,15 @@ export class TrackingPolicy {
     if (this.consent.isOptedOut()) return true
     if (this.config.respectDnt && this.dnt.isEnabled()) return true
     if (this.config.excludeLocalhost && this.isLocalhost(this.env.hostname())) return true
+    if (this.isExcludedPath(this.env.path())) return true
     if (this.config.sampleRate < 1 && this.random() >= this.config.sampleRate) return true
+    return false
+  }
+
+  private isExcludedPath(path: string): boolean {
+    for (const pre of this.config.exclude) {
+      if (path === pre || path.startsWith(pre + '/')) return true
+    }
     return false
   }
 

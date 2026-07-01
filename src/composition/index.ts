@@ -47,6 +47,7 @@ export interface InitOptions {
   scriptOrigin?: string
   respectDnt?: boolean
   excludeLocalhost?: boolean
+  exclude?: string[]
   enabled?: boolean
   debug?: boolean
   sampleRate?: number
@@ -74,6 +75,7 @@ export function init(opts: InitOptions = {}): Analytics {
     scriptOrigin: opts.scriptOrigin,
     respectDnt: opts.respectDnt,
     excludeLocalhost: opts.excludeLocalhost,
+    exclude: opts.exclude,
     enabled: opts.enabled,
     debug: opts.debug,
     sampleRate: opts.sampleRate,

@@ -25,6 +25,7 @@ function fakeClick() {
 function fakeEnv(hostname = 'example.com'): EnvironmentProvider {
   return {
     hostname: () => hostname,
+    path: () => '/',
     url: () => `https://${hostname}/`,
     referrer: () => '',
     width: () => 1280,

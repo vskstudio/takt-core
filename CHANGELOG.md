@@ -1,5 +1,11 @@
 # @vskstudio/takt-core
 
+## 0.8.0
+
+### Minor Changes
+
+- Add an `exclude` option (path-prefix allowlist) to the full SDK (`init()` / `createTakt()`): pages whose path matches an excluded prefix are never tracked. Segment-bounded (`/app` matches `/app` and `/app/…` but not `/application`) and checked at send time, so it holds across SPA navigation and covers pageviews and named events alike. The minimal CDN snippet stays within its ≤ 1 kB budget and does not carry this option.
+
 ## 0.7.0
 
 ### Minor Changes
